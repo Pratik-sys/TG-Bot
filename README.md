@@ -1,5 +1,6 @@
 # TG-Bot
-> A Telegram bot to provide daily alerts and learning through telegram chat application
+> A Telegram bot to provide daily alerts and learning through telegram chat application. 
+
 
 
 ### TODO
@@ -8,3 +9,11 @@
 - [ ] Collecting APIs to remove hard-coded values.
 - [ ] Change the priority of the project timeline
 - [ ] Add more functionality
+
+### Functional Requirements
+- [ ] Send daily updates
+- [ ] A fixed-time notification
+- [ ] Count of total learning articles
+
+### Non-Functional Requirements.
+- [ ] Create polls on weekly basis
