@@ -1,48 +1,89 @@
 import logging, os
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import (
+    Updater,
+    CommandHandler,
+
+)
 from dotenv import load_dotenv
 
 load_dotenv(".env")
+
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
-    )
+)
 
 logger = logging.getLogger(__name__)
+counter = 0
 
 
 def start(update, context):
-    """Send a message when the command /start is issued."""
-    update.message.reply_text("Hi!, I am delayed bot")
+    try:
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=f"Hello {update.effective_chat.username}!, You can use /quote command to get a quote",
+        )
+    except Exception as ex:
+        print(ex)
 
 
-def help(update, context):
-    """Send a message when the command /help is issued."""
-    update.message.reply_text("Help!")
+def callback_quote(context):
+    try:
+        chat_id = context.job.context
+        print(chat_id)
+        context.bot.send_message(chat_id = chat_id, text= "Yeah just testing it!")
+    except Exception as ex:
+        print(ex)
+
+def get(update, context):
+    try:
+        context.job_queue.run_repeating(callback_quote, interval = 5, first = 30,
+    context = update.message.chat_id)
+    except Exception as ex:
+        print(ex)
+
+def callback_quote(context):
+    try:
+        chat_id = context.job.context
+        print(chat_id)
+        context.bot.send_message(chat_id = chat_id, text= "Yeah just testing it!")
+    except Exception as ex:
+        print(ex)
+
+def quote(update, context):
+    global counter
+    try:
+        quotes = [
+            "Be yourself; everyone else is already taken.",
+            "So many books, so little time",
+            "A room without books is like a body without a soul.",
+        ]
+        if update.effective_message.text == "/quote":
+            context.bot.send_message(
+                chat_id=update.effective_chat.id, text=quotes[counter]
+            )
+            counter += 1
+        else:
+            counter = 0
+    except Exception as ex:
+        print(ex)
 
 
 def error(update, context):
     """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
+    logger.warning('caused error "%s"', context.error)
 
 
 def main():
     """Start the bot."""
-    # Create the Updater and pass it your bot's token.
-    # Make sure to set use_context=True to use the new context based callbacks
-    # Post version 12 this will no longer be necessary
     updater = Updater(os.getenv("TOKEN"), use_context=True)
-
-    # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(CommandHandler("quote", quote))
+    dp.add_handler(CommandHandler("get", get))
 
-    # log all errors
     dp.add_error_handler(error)
 
-    # Start the Bot
     updater.start_polling()
     updater.idle()
 
