@@ -23,50 +23,32 @@ def start(update, context):
             text=f"Hello {update.effective_chat.username}!, You can use /quote command to get a quote",
         )
     except Exception as ex:
-        print(ex)
+        print(f' Error of start {ex}')
+        return
 
 
 def callback_quote(context):
-    try:
-        chat_id = context.job.context
-        print(chat_id)
-        context.bot.send_message(chat_id = chat_id, text= "Yeah just testing it!")
-    except Exception as ex:
-        print(ex)
-
-def get(update, context):
-    try:
-        context.job_queue.run_repeating(callback_quote, interval = 5, first = 30,
-    context = update.message.chat_id)
-    except Exception as ex:
-        print(ex)
-
-def callback_quote(context):
-    try:
-        chat_id = context.job.context
-        print(chat_id)
-        context.bot.send_message(chat_id = chat_id, text= "Yeah just testing it!")
-    except Exception as ex:
-        print(ex)
-
-def quote(update, context):
     global counter
-    try:
-        quotes = [
+    quotes = [
             "Be yourself; everyone else is already taken.",
             "So many books, so little time",
             "A room without books is like a body without a soul.",
         ]
-        if update.effective_message.text == "/quote":
-            context.bot.send_message(
-                chat_id=update.effective_chat.id, text=quotes[counter]
-            )
-            counter += 1
-        else:
-            counter = 0
+    try:
+        chat_id = context.job.context
+        context.bot.send_message(chat_id = chat_id, text= quotes[counter])
+        counter+=1
     except Exception as ex:
-        print(ex)
+       print(f'Error of callback_quote {ex}')
+       return
 
+def quote(update, context):
+    try:
+        if update.effective_message.text =="/quote":
+            context.job_queue.run_once(callback_quote,2,context = update.message.chat_id, name=None)
+    except Exception as ex:
+       print(f'Error of quote {ex}')
+       return 
 
 def error(update, context):
     """Log Errors caused by Updates."""
@@ -80,7 +62,7 @@ def main():
 
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("quote", quote))
-    dp.add_handler(CommandHandler("get", get))
+    # dp.add_handler(CommandHandler("get", get))
 
     dp.add_error_handler(error)
 
