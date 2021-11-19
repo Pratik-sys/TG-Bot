@@ -44,8 +44,7 @@ def callback_quote(context):
 
 def quote(update, context):
     try:
-        if update.effective_message.text =="/quote":
-            context.job_queue.run_once(callback_quote,2,context = update.message.chat_id, name=None)
+        context.job_queue.run_once(callback_quote,2,context = update.message.chat_id, name=None)
     except Exception as ex:
        print(f'Error of quote {ex}')
        return 
