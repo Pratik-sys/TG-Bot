@@ -1,8 +1,7 @@
-import logging, os
+import logging, os, datetime
 from telegram.ext import (
     Updater,
     CommandHandler,
-
 )
 from dotenv import load_dotenv
 
@@ -23,31 +22,43 @@ def start(update, context):
             text=f"Hello {update.effective_chat.username}!, You can use /quote command to get a quote",
         )
     except Exception as ex:
-        print(f' Error of start {ex}')
+        print(f" Error of start {ex}")
         return
 
 
 def callback_quote(context):
     global counter
     quotes = [
-            "Be yourself; everyone else is already taken.",
-            "So many books, so little time",
-            "A room without books is like a body without a soul.",
-        ]
+        "Be yourself; everyone else is already taken.",
+        "So many books, so little time",
+        "A room without books is like a body without a soul.",
+    ]
     try:
         chat_id = context.job.context
-        context.bot.send_message(chat_id = chat_id, text= quotes[counter])
-        counter+=1
+        context.bot.send_message(chat_id=chat_id, text=quotes[counter])
+        counter += 1
     except Exception as ex:
-       print(f'Error of callback_quote {ex}')
-       return
+        print(f"Error of callback_quote {ex}")
+        return
+
 
 def quote(update, context):
     try:
-        context.job_queue.run_once(callback_quote,2,context = update.message.chat_id, name=None)
+        context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="You'll get notified with a quote at 8 AM daily",
+        )
+        context.job_queue.run_daily(
+            callback_quote,
+            time=datetime.time(hour=8, minute=00, second=00),
+            days=(0, 1, 2, 3, 4, 5, 6),
+            context=update.message.chat_id,
+            name=None,
+        )
     except Exception as ex:
-       print(f'Error of quote {ex}')
-       return 
+        print(f"Error of quote {ex}")
+        return
+
 
 def error(update, context):
     """Log Errors caused by Updates."""
