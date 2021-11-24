@@ -1,4 +1,4 @@
-import logging, os, datetime
+import logging, os, datetime,pytz
 from telegram.ext import (
     Updater,
     CommandHandler,
@@ -46,15 +46,17 @@ def quote(update, context):
     try:
         context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text="You'll get notified with a quote at 8 AM daily",
+            text="Setting a daily notification",
         )
+        time = datetime.time(hour=7,minute=0,  tzinfo=pytz.timezone('Asia/Kolkata'))
         context.job_queue.run_daily(
             callback_quote,
-            time=datetime.time(hour=8, minute=00, second=00),
-            days=(0, 1, 2, 3, 4, 5, 6),
+            time,
+            days=tuple(range(6)),
             context=update.message.chat_id,
-            name=None,
+            name= str(update.effective_chat.id)
         )
+
     except Exception as ex:
         print(f"Error of quote {ex}")
         return
