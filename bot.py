@@ -12,7 +12,8 @@ bot = telebot.TeleBot(BOT_TOKEN)
 
 async def fetchword():
     response = requests.get(os.getenv("URL"))
-    return response
+    content = response.json()
+    return content.get('word')
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
