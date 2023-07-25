@@ -1,4 +1,4 @@
-import os, logging, requests,asyncio
+import os, logging,requests,asyncio, time, threading, schedule
 import telebot
 from dotenv import load_dotenv
 
@@ -16,12 +16,30 @@ async def fetchword():
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.reply_to(message, f"Hello {message.from_user.username}")
-    bot.reply_to(message, asyncio.run(fetchword()))
+    bot.reply_to(message, f"Hello {message.from_user.username} use `/set` command to set the timer")
 
-def main():
-    bot.infinity_polling()
+@bot.message_handler(commands=['set'])
+def set_timer(message):
+    print(message.text)
+    user_input  = message.text.split()
+    if(len(user_input) > 1 and user_input[1].isdigit()):
+        shdl = int(user_input[1])
+        print(shdl)
+        schedule.every(shdl).seconds.do(send_word, message.chat.id).tag(message.chat.id)
+    else:
+        bot.reply_to(message, 'Usage: /set <seconds>')
 
-if __name__ == "__main__":
+@bot.message_handler(commands=['unset'])
+def unset_timer(message):
+    schedule.clear(message.chat.id)
+                   
+def send_word(chat_id):
+    bot.send_message(chat_id, asyncio.run(fetchword()))
+
+
+if __name__ == '__main__':
     logger.info("Starting Bot!!")
-    main()
+    threading.Thread(target=bot.infinity_polling, name='bot_infinity_polling', daemon=True).start()
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
