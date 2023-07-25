@@ -21,22 +21,31 @@ def send_welcome(message):
 
 @bot.message_handler(commands=['set'])
 def set_timer(message):
-    print(message.text)
     user_input  = message.text.split()
     if(len(user_input) > 1 and user_input[1].isdigit()):
         shdl = int(user_input[1])
-        print(shdl)
+        # schedule.every.day.at(shdl).do(send_word, message.chat.id).tag(message.chat.id)
         schedule.every(shdl).seconds.do(send_word, message.chat.id).tag(message.chat.id)
+        bot.reply_to(message, f"Timer has been set to {shdl} seconds")
+
     else:
-        bot.reply_to(message, 'Usage: /set <seconds>')
+        bot.reply_to(message, 'Usage: /set <time>')
 
 @bot.message_handler(commands=['unset'])
 def unset_timer(message):
     schedule.clear(message.chat.id)
-                   
-def send_word(chat_id):
-    bot.send_message(chat_id, asyncio.run(fetchword()))
+    bot.reply_to(message, "Schedule is been cleared from the queue")
 
+@bot.message_handler(commands=['listjobs'])
+def getjoblist(message):
+    joblist  = schedule.get_jobs()
+    if(joblist):
+        bot.reply_to(message, schedule.get_jobs())
+    else:
+        bot.reply_to(message, "No schedule is set so far, please use `/set <time>` command to set timer")
+                   
+def send_word(message):
+    bot.send_message(message, asyncio.run(fetchword()))
 
 if __name__ == '__main__':
     logger.info("Starting Bot!!")
