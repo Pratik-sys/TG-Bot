@@ -1,4 +1,4 @@
-import os, logging, requests
+import os, logging, requests,asyncio
 import telebot
 from dotenv import load_dotenv
 
@@ -10,13 +10,14 @@ logger = logging.getLogger(__name__)
 BOT_TOKEN = os.getenv("TOKEN")
 bot = telebot.TeleBot(BOT_TOKEN)
 
-def fetchword():
+async def fetchword():
     response = requests.get(os.getenv("URL"))
     return response
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     bot.reply_to(message, f"Hello {message.from_user.username}")
+    bot.reply_to(message, asyncio.run(fetchword()))
 
 def main():
     bot.infinity_polling()
