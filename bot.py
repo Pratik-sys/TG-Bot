@@ -1,85 +1,25 @@
-import logging, os, datetime,pytz
-from telegram.ext import (
-    Updater,
-    CommandHandler,
-)
+import os, logging, requests
+import telebot
 from dotenv import load_dotenv
 
 load_dotenv(".env")
-
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
-
 logger = logging.getLogger(__name__)
-counter = 0
+BOT_TOKEN = os.getenv("TOKEN")
+bot = telebot.TeleBot(BOT_TOKEN)
 
+def fetchword():
+    response = requests.get(os.getenv("URL"))
+    return response
 
-def start(update, context):
-    try:
-        context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=f"Hello {update.effective_chat.username}!, You can use /quote command to get a quote",
-        )
-    except Exception as ex:
-        print(f" Error of start {ex}")
-        return
-
-
-def callback_quote(context):
-    global counter
-    quotes = [
-        "Be yourself; everyone else is already taken.",
-        "So many books, so little time",
-        "A room without books is like a body without a soul.",
-    ]
-    try:
-        chat_id = context.job.context
-        context.bot.send_message(chat_id=chat_id, text=quotes[counter])
-        counter += 1
-    except Exception as ex:
-        print(f"Error of callback_quote {ex}")
-        return
-
-
-def quote(update, context):
-    try:
-        context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text="Setting a daily notification",
-        )
-        time = datetime.time(hour=7,minute=0,  tzinfo=pytz.timezone('Asia/Kolkata'))
-        context.job_queue.run_daily(
-            callback_quote,
-            time,
-            days=tuple(range(6)),
-            context=update.message.chat_id,
-            name= str(update.effective_chat.id)
-        )
-
-    except Exception as ex:
-        print(f"Error of quote {ex}")
-        return
-
-
-def error(update, context):
-    """Log Errors caused by Updates."""
-    logger.warning('caused error "%s"', context.error)
-
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    bot.reply_to(message, f"Hello {message.from_user.username}")
 
 def main():
-    """Start the bot."""
-    updater = Updater(os.getenv("TOKEN"), use_context=True)
-    dp = updater.dispatcher
-
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("quote", quote))
-
-    dp.add_error_handler(error)
-
-    updater.start_polling()
-    updater.idle()
-
+    bot.infinity_polling()
 
 if __name__ == "__main__":
     logger.info("Starting Bot!!")
