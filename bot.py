@@ -45,7 +45,9 @@ def getjoblist(message):
         bot.reply_to(message, "No schedule is set so far, please use `/set <time>` command to set timer")
                    
 def send_word(message):
-    bot.send_message(message, asyncio.run(fetchword()))
+    word = asyncio.run(fetchword())
+    dictlink = f"https://www.google.com/search?q={word}"
+    bot.send_message(message, f"Checkout for new word today is {word} \n\n please navigate to given link to checkout the defintion {dictlink}")
 
 if __name__ == '__main__':
     logger.info("Starting Bot!!")
