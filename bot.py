@@ -5,7 +5,8 @@ from RandomWord import getRandomWord
 
 load_dotenv(".env")
 logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", 
+    level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 BOT_TOKEN = os.getenv("TOKEN")
@@ -23,22 +24,27 @@ def set_timer(message):
         # schedule.every.day.at(shdl).do(send_word, message.chat.id).tag(message.chat.id)
         schedule.every(shdl).seconds.do(send_word, message.chat.id).tag(message.chat.id)
         bot.reply_to(message, f"Timer has been set to {shdl} seconds")
-
+        logger.info(f"Timer has been set to {shdl}s")
     else:
         bot.reply_to(message, 'Usage: /set <time>')
 
 @bot.message_handler(commands=['unset'])
 def unset_timer(message):
+    
     schedule.clear(message.chat.id)
     bot.reply_to(message, "Schedule is been cleared from the queue")
+    logger.info(f"Schedule is removed from queue for user -  {message.from_user.username}  ")
 
 @bot.message_handler(commands=['listjobs'])
 def getjoblist(message):
     joblist  = schedule.get_jobs()
     if(joblist):
         bot.reply_to(message, schedule.get_jobs())
+        logger.info(f"list of schedule for the user -  {message.from_user.username} are {joblist} ")
     else:
         bot.reply_to(message, "No schedule is set so far, please use `/set <time>` command to set timer")
+        logger.info(f"No Shcedule found for user -  {message.from_user.username}  ")
+
                    
 def send_word(message):
     word = getRandomWord()
