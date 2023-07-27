@@ -1,6 +1,7 @@
 import os, logging,requests,asyncio, time, threading, schedule
 import telebot
 from dotenv import load_dotenv
+from RandomWord import getRandomWord
 
 load_dotenv(".env")
 logging.basicConfig(
@@ -45,7 +46,7 @@ def getjoblist(message):
         bot.reply_to(message, "No schedule is set so far, please use `/set <time>` command to set timer")
                    
 def send_word(message):
-    word = asyncio.run(fetchword())
+    word = getRandomWord()
     dictlink = f"https://www.google.com/search?q={word}"
     bot.send_message(message, f"Checkout for new word today is {word} \n\n please navigate to given link to checkout the defintion {dictlink}")
 
