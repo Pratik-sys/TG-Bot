@@ -1,4 +1,4 @@
-import os, logging,requests,asyncio, time, threading, schedule
+import os, logging, time, threading, schedule
 import telebot
 from dotenv import load_dotenv
 from RandomWord import getRandomWord
@@ -10,11 +10,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 BOT_TOKEN = os.getenv("TOKEN")
 bot = telebot.TeleBot(BOT_TOKEN)
-
-async def fetchword():
-    response = requests.get(os.getenv("URL"))
-    content = response.json()
-    return content.get('word')
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
