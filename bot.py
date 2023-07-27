@@ -1,7 +1,7 @@
 import os, logging, time, threading, schedule
 import telebot
 from dotenv import load_dotenv
-from RandomWord import getRandomWord
+from utils.utilityFunctions import getRandomWord, is_time_format
 
 load_dotenv(".env")
 logging.basicConfig(
@@ -19,12 +19,12 @@ def send_welcome(message):
 @bot.message_handler(commands=['set'])
 def set_timer(message):
     user_input  = message.text.split()
-    if(len(user_input) > 1 and user_input[1].isdigit()):
-        shdl = int(user_input[1])
-        # schedule.every.day.at(shdl).do(send_word, message.chat.id).tag(message.chat.id)
-        schedule.every(shdl).seconds.do(send_word, message.chat.id).tag(message.chat.id)
-        bot.reply_to(message, f"Timer has been set to {shdl} seconds")
-        logger.info(f"Timer has been set to {shdl}s")
+    if(is_time_format(user_input[1])):
+        shdl =user_input[1]
+        schedule.every().day.at(shdl).do(send_word, message.chat.id).tag(message.chat.id)
+        #schedule.every(shdl).seconds.do(send_word, message.chat.id).tag(message.chat.id)
+        bot.reply_to(message, f"Timer has been set to *{shdl}* hours", parse_mode='MARKDOWN')
+        logger.info(f"Timer has been set to {shdl} hrs")
     else:
         bot.reply_to(message, 'Usage: /set <time>')
 

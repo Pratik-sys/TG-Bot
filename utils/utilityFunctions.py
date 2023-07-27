@@ -1,4 +1,6 @@
-import random
+import random, re
+
+time_re = re.compile(r'^(([01]\d|2[0-3]):([0-5]\d)|24:00)$')
 
 def getRandomWord():
   try:
@@ -10,4 +12,7 @@ def getRandomWord():
   except Exception as err:
     print(err)
 
+
+def is_time_format(inpt):
+    return bool(time_re.match(inpt))
 
